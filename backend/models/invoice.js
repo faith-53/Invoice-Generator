@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
+const items = require('./items');
 
 const InvoiceSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
+    ref: 'user',
     required: true
   },
   invoiceNumber: {
@@ -14,40 +15,47 @@ const InvoiceSchema = new mongoose.Schema({
   client: {
     name: {
       type: String,
-      required: [true, 'Please add client name']
+      required: [true, 'Please add client name'],
+      trim: true
     },
     email: {
       type: String,
-      required: [true, 'Please add client email']
+      required: [true, 'Please add client email'],
+      unique: true,
+      trim: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,7})+$/,
+        'Please add a valid email address'
+      ]
     },
     address: {
       type: String,
-      required: [true, 'Please add client address']
+      required: [true, 'Please add client address'],
+      trim: true
     },
     phone: {
-      type: String
+      type: String,
+      trim: true
     }
   },
-  items: [
-    {
-      description: {
-        type: String,
-        required: [true, 'Please add item description']
-      },
-      quantity: {
-        type: Number,
-        required: [true, 'Please add item quantity']
-      },
-      rate: {
-        type: Number,
-        required: [true, 'Please add item rate']
-      },
-      amount: {
-        type: Number,
-        required: [true, 'Please add item amount']
-      }
-    }
-  ],
+  items: {
+    description: {
+            type: String,
+            required: [true, 'Please add item description']
+        },
+        quantity: {
+            type: Number,
+            required: [true, 'Please add item quantity']
+        },
+        rate: {
+            type: Number,
+            required: [true, 'Please add item rate']
+        },
+        amount: {
+            type: Number,
+            required: [true, 'Please add item amount']
+        }
+  },
   subtotal: {
     type: Number,
     required: true
@@ -75,10 +83,6 @@ const InvoiceSchema = new mongoose.Schema({
     type: String,
     enum: ['paid', 'pending', 'overdue', 'draft'],
     default: 'pending'
-  },
-  dueDate: {
-    type: Date,
-    required: [true, 'Please add a due date']
   },
   createdAt: {
     type: Date,

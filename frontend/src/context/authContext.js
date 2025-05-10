@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { login, register, logout, getMe } from '../services/authService';
 
 const AuthContext = createContext();
@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
       const userData = await login(credentials);
       setUser(userData);
       setIsAuthenticated(true);
-      history.push('/');
+      navigate('/');
     } catch (error) {
       throw error;
     }
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   const registerUser = async (userData) => {
     try {
       await register(userData);
-      history.push('/login');
+      navigate('/login');
     } catch (error) {
       throw error;
     }
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
       await logout();
       setUser(null);
       setIsAuthenticated(false);
-      history.push('/login');
+    navigate('/login');
     } catch (error) {
       throw error;
     }

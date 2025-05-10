@@ -4,13 +4,13 @@ const generatePDF = require('../utils/generatePDF.js');
 
 // Get all invoices
 // @route   GET /api/invoices
-exports.getInvoices = async (req, res, next) => {
+const getInvoices = async (req, res, next) => {
   res.status(200).json(res.advancedResults);
 };
 
 //Get single invoice
 // @route   GET /api/invoices/:id
-exports.getInvoice = async (req, res, next) => {
+const getInvoice = async (req, res, next) => {
   const invoice = await Invoice.findById(req.params.id).populate({
     path: 'user',
     select: 'name email company address phone'
@@ -33,7 +33,7 @@ exports.getInvoice = async (req, res, next) => {
 
 // Create new invoice
 // @route   POST /api/invoices
-exports.createInvoice = async (req, res, next) => {
+const createInvoice = async (req, res, next) => {
   // Add user to req.body
   req.body.user = req.user.id;
 
@@ -59,7 +59,7 @@ exports.createInvoice = async (req, res, next) => {
 //  Update invoice
 // @route   PUT /api/invoices/:id
 
-exports.updateInvoice = async (req, res, next) => {
+const updateInvoice = async (req, res, next) => {
   let invoice = await Invoice.findById(req.params.id);
 
   if (!invoice) {
@@ -96,7 +96,7 @@ exports.updateInvoice = async (req, res, next) => {
 
 // Delete invoice
 // @route   DELETE /api/invoices/:id
-exports.deleteInvoice = async (req, res, next) => {
+const deleteInvoice = async (req, res, next) => {
   const invoice = await Invoice.findById(req.params.id);
 
   if (!invoice) {
@@ -118,7 +118,7 @@ exports.deleteInvoice = async (req, res, next) => {
 
 //Download invoice as PDF
 // @route   GET /api/invoices/:id/download
-exports.downloadInvoice = async (req, res, next) => {
+const downloadInvoice = async (req, res, next) => {
   const invoice = await Invoice.findById(req.params.id).populate({
     path: 'user',
     select: 'name email company address phone'
@@ -151,7 +151,7 @@ exports.downloadInvoice = async (req, res, next) => {
 // @desc    Send invoice via email
 // @route   POST /api/invoices/:id/send
 // @access  Private
-exports.sendInvoice = async (req, res, next) => {
+const sendInvoice = async (req, res, next) => {
   const invoice = await Invoice.findById(req.params.id).populate({
     path: 'user',
     select: 'name email company address phone'
@@ -205,4 +205,14 @@ exports.sendInvoice = async (req, res, next) => {
     console.error(err);
     return res.status(500).json({'message':'Email could not be sent'}); 
   }
+};
+
+module.exports = {
+  sendInvoice,
+  createInvoice,
+  updateInvoice,
+  deleteInvoice,
+  downloadInvoice,
+  getInvoice,
+  getInvoices,
 };

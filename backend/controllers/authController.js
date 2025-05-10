@@ -5,10 +5,8 @@ require('dotenv').config();
 const fsPromises = require('fs').promises;
 const path  = require('path')
 
-
-// @desc    Register user
+// Register user
 // @route   POST /api/auth/register
-// @access  Public
 const handleRegister = async (req, res) => {
   const { name, email, password, company, address, phone } = req.body;
 
@@ -23,58 +21,59 @@ const handleRegister = async (req, res) => {
   });
 
 };
-module.exports = handleRegister
 
 // Login user
 // @route   POST /api/auth/login
-
 const handleLogin = async (req, res) => {
   const { email, password } = req.body;
 
   // Validate email & password
   if (!email || !password) {
-    return res.status(400).json({'message':'Please provide an email and a password'});
+    return res.status(400).json({ message: 'Please provide an email and a password' });
   }
 
-  // Check for user
-  const user = await User.findOne({ email }).select('+password');
+  try {
+    // Check for user
+    const user = await User.findOne({ email }).select('+password');
 
-  if (!user) {
-    return res.status(400).json({'message':'User does not exist'});
+    if (!user) {
+      return res.status(400).json({ message: 'User  does not exist' });
+    }
+
+    // Check if password matches
+    const isMatch = await bcrypt.compare(password, user.password); // Corrected here
+
+    if (isMatch) {
+      const accessToken = jwt.sign(
+        { email: user.email },
+        process.env.ACCESS_TOKEN,
+        { expiresIn: '10m' }
+      );
+
+      const refreshToken = jwt.sign(
+        { email: user.email },
+        process.env.REFRESH_TOKEN,
+        { expiresIn: '1d' }
+      );
+
+      // Assuming you want to store the refresh token in the database
+      user.refreshToken = refreshToken; // Store refresh token in user document
+      await user.save(); // Save the updated user document
+
+      // Set the refresh token in a cookie
+      res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
+      return res.json({ accessToken });
+    } else {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
   }
-
-  // Check if password matches
-  const isMatch = await bcrypt.compare(email, password);
-
-  if (isMatch) {
-    const accessToken = jwt.sign(
-      {'email': user.email},
-      process.env.ACCESS_TOKEN,
-      {expiresIn: '10m'},
-    )
-
-    const refreshToken = jwt.sign(
-      {'email': user.email},
-      process.env.REFRESH_TOKEN,
-      {expiresIn: '1d'},
-    )
-    const otherUsers = User.filter(person => person.email !== user.email)
-    const currentUser = {...user, refreshToken}
-    User.setUsers([...otherUsers, currentUser])
-    await fsPromises.writeFile(
-      path.join(__dirname, '..', 'model', 'user'),
-      JSON.stringify(user)
-    )
-    res.cookie('jwt', refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-    return res.json({accessToken});
-  } else {
-    return res.status(401).json({'message':'Invalid credentials'});
-  }
-
 };
-module.exports = handleLogin;
 
 // refresh token
+// @route   POST /api/auth/refresh
 const handleRefreshToken = async (req, res) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(401);
@@ -100,20 +99,16 @@ const handleRefreshToken = async (req, res) => {
     }
   )
 };
-module.exports = handleRefreshToken;
 
 //Get current logged in user
 // @route   GET /api/auth/me
-
 const getMe = async (req, res, next) => {
   const user = await User.findById(req.user.id);
-
   res.status(200).json({
     success: true,
     data: user
   });
 };
-module.exports = {getMe}
 
 // Log user out / clear cookie
 // @route   GET /api/auth/logout
@@ -128,7 +123,6 @@ const logout = async (req, res, next) => {
     data: {}
   });
 };
-module.exports = logout;
 
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
@@ -153,4 +147,13 @@ const sendTokenResponse = (user, statusCode, res) => {
       success: true,
       token
     });
+};
+
+module.exports = {
+  handleRegister,
+  handleRefreshToken,
+  handleLogin,
+  getMe,
+  logout,
+  sendTokenResponse,
 };

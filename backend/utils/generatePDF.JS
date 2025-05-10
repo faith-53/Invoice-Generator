@@ -1,6 +1,4 @@
 const PDFDocument = require('pdfkit');
-const fs = require('fs');
-const path = require('path');
 
 const generatePDF = async (invoice) => {
   return new Promise((resolve, reject) => {

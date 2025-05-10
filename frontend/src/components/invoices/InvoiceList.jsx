@@ -1,18 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Table,
-  Button,
-  Card,
-  Badge,
-  Form,
-  Row,
-  Col,
-  Spinner
-} from 'react-bootstrap';
+import {Table, Badge, Form, Row, Col, Spinner} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { useAlert } from '../../../context/alertContext';
-import { getInvoices } from '../../../services/invoiceService';
-import { formatDate } from '../../../utils/dateUtils';
+import { getInvoices } from '../../context/invoiceContext';
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
@@ -22,7 +11,6 @@ const InvoiceList = () => {
     fromDate: '',
     toDate: ''
   });
-  const { alert } = useAlert();
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -69,10 +57,10 @@ const InvoiceList = () => {
   }
 
   return (
-    <Card>
-      <Card.Body>
+    <div className='card'>
+      <div className="card-body">
         <h2 className="mb-4">Invoices</h2>
-        {alert && <Alert variant={alert.type}>{alert.message}</Alert>}
+        
         <Row className="mb-3">
           <Col md={3}>
             <Form.Group>
@@ -113,9 +101,9 @@ const InvoiceList = () => {
             </Form.Group>
           </Col>
           <Col md={3} className="d-flex align-items-end">
-            <Button as={Link} to="/invoices/new" variant="primary">
+            <Link to="/invoices/new" className='btn btn-primary'>
               New Invoice
-            </Button>
+            </Link>
           </Col>
         </Row>
         <Table striped bordered hover responsive>
@@ -124,7 +112,6 @@ const InvoiceList = () => {
               <th>Invoice #</th>
               <th>Client</th>
               <th>Date</th>
-              <th>Due Date</th>
               <th>Total</th>
               <th>Status</th>
               <th>Actions</th>
@@ -136,8 +123,7 @@ const InvoiceList = () => {
                 <tr key={invoice._id}>
                   <td>{invoice.invoiceNumber}</td>
                   <td>{invoice.client.name}</td>
-                  <td>{formatDate(new Date(invoice.createdAt))}</td>
-                  <td>{formatDate(new Date(invoice.dueDate))}</td>
+                  <td>{new Date(invoice.createdAt)}</td>
                   <td>${invoice.total.toFixed(2)}</td>
                   <td>
                     <Badge variant={getStatusBadge(invoice.status)}>
@@ -145,23 +131,24 @@ const InvoiceList = () => {
                     </Badge>
                   </td>
                   <td>
-                    <Button
+                    <button
                       as={Link}
                       to={`/invoices/${invoice._id}`}
                       variant="info"
                       size="sm"
-                      className="mr-2"
+                      className="mr-2 btn btn-secondary"
                     >
                       View
-                    </Button>
-                    <Button
+                    </button>
+                    <button
                       as={Link}
                       to={`/invoices/${invoice._id}/edit`}
                       variant="secondary"
+                      className='btn btn-secodary'
                       size="sm"
                     >
                       Edit
-                    </Button>
+                    </button>
                   </td>
                 </tr>
               ))
@@ -174,8 +161,8 @@ const InvoiceList = () => {
             )}
           </tbody>
         </Table>
-      </Card.Body>
-    </Card>
+      </div>
+    </div>
   );
 };
 
