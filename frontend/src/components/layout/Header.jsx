@@ -1,19 +1,19 @@
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Navbar, Nav, Button } from 'react-bootstrap';
 import { useAuth } from '../../context/authContext';
 
 const Header = () => {
   const { user, logoutUser } = useAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logoutUser();
-    history.push('/login');
+    navigate('/login');
   };
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg">
+    <Navbar bg="dark" variant="dark" expand="lg" className='nav nav-pills flex-column flex-sm-row'>
       <Navbar.Brand as={Link} to="/">
         Invoice App
       </Navbar.Brand>

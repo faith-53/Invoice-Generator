@@ -8,17 +8,27 @@ const path  = require('path')
 // Register user
 // @route   POST /api/auth/register
 const handleRegister = async (req, res) => {
-  const { name, email, password, company, address, phone } = req.body;
+  try {
+    const { name, email, password, company, address, phone } = req.body;
+
+    if (!name || !email || !password || !company || !address || !phone) {
+        return res.status(400).json({ success: false, message: 'All fields  are required.' });
+      }
 
   // Create user
-  const user = await User.create({
-    name,
-    email,
-    password,
-    company,
-    address,
-    phone
-  });
+    const user = await User.create({
+      name,
+      email,
+      password,
+      company,
+      address,
+      phone
+    });
+    res.status(201).json({ success: true, message: 'User  registered successfully.' });
+  } catch(error){
+    console.error('Registration error', error)
+    res.status(500).json({success: false, message: 'Server error'})
+  }
 
 };
 
@@ -26,40 +36,32 @@ const handleRegister = async (req, res) => {
 // @route   POST /api/auth/login
 const handleLogin = async (req, res) => {
   const { email, password } = req.body;
-
   // Validate email & password
   if (!email || !password) {
     return res.status(400).json({ message: 'Please provide an email and a password' });
   }
-
   try {
     // Check for user
     const user = await User.findOne({ email }).select('+password');
-
     if (!user) {
       return res.status(400).json({ message: 'User  does not exist' });
     }
-
     // Check if password matches
     const isMatch = await bcrypt.compare(password, user.password); // Corrected here
-
     if (isMatch) {
       const accessToken = jwt.sign(
         { email: user.email },
         process.env.ACCESS_TOKEN,
         { expiresIn: '10m' }
       );
-
       const refreshToken = jwt.sign(
         { email: user.email },
         process.env.REFRESH_TOKEN,
         { expiresIn: '1d' }
       );
-
       // Assuming you want to store the refresh token in the database
       user.refreshToken = refreshToken; // Store refresh token in user document
       await user.save(); // Save the updated user document
-
       // Set the refresh token in a cookie
       res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
       return res.json({ accessToken });
@@ -100,15 +102,7 @@ const handleRefreshToken = async (req, res) => {
   )
 };
 
-//Get current logged in user
-// @route   GET /api/auth/me
-const getMe = async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  res.status(200).json({
-    success: true,
-    data: user
-  });
-};
+
 
 // Log user out / clear cookie
 // @route   GET /api/auth/logout
@@ -153,7 +147,6 @@ module.exports = {
   handleRegister,
   handleRefreshToken,
   handleLogin,
-  getMe,
   logout,
   sendTokenResponse,
 };

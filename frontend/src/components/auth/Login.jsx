@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { Form, Button, Card, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Form, Card, Alert } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
-import { useAlert } from '../../context/alertContext';
+
 
 const Login = () => {
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState({
     email: '',
     password: ''
   });
   const { loginUser } = useAuth();
-  const { alert, showAlert } = useAlert();
+
 
   const handleChange = (e) => {
     setCredentials({
@@ -23,8 +24,9 @@ const Login = () => {
     e.preventDefault();
     try {
       await loginUser(credentials);
+      navigate('/invoices');
     } catch (error) {
-      showAlert('Invalid credentials');
+      //showAlert('Invalid credentials');
       console.error('Login error:', error);
     }
   };
@@ -56,9 +58,9 @@ const Login = () => {
                 required
               />
             </Form.Group>
-            <Button type="submit" className="w-100 mt-3">
+            <button type="submit" className="w-100 mt-3 btn btn-primary">
               Login
-            </Button>
+            </button>
           </Form>
           <div className="w-100 text-center mt-3">
             <Link to="/register">Need an account? Register</Link>

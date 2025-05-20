@@ -1,18 +1,25 @@
 import { Routes, Route } from "react-router-dom";
 import InvoiceItem from "./components/invoices/InvoiceItem";
-import Navbar from "./components/ui/Navbar";
+//import Navbar from "./components/ui/Navbar";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import InvoiceList from "./components/invoices/InvoiceList";
 import InvoiceForm from "./components/invoices/InvoiceForm";
+import Login from "./components/auth/Login";
+import Register from "./components/auth/Register"
+import Header from "./components/layout/Header";
+import Home from "./Pages/Home";
 
 
 function App() {
   return (
     <div>
-      <Navbar />
+      <Header />
         <Routes>
-          <Route path="/" element={<InvoiceList />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/invoices" element={<InvoiceList />} />
           <Route path="/invoice/:invoiceId" element={<InvoiceItem />} />
           <Route path="/invoices/new" element={<InvoiceForm />} />
           

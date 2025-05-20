@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Row, Col, Alert, Spinner, Modal } from 'react-bootstrap';
+import { Form, Row, Col, Alert, Spinner, Modal, Button } from 'react-bootstrap';
 import { useForm } from '../../hooks/useForm';
 import { getInvoice, createInvoice, updateInvoice } from '../../context/invoiceContext';
 
@@ -10,6 +10,7 @@ const InvoiceForm = () => {
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [showClientModal, setShowClientModal] = useState(false);
+  const sanitizeNumber = (val) => (isNaN(val) ? '' : val);
 
   const { values, setValues, handleChange, handleArrayChange } = useForm({
     client: {
@@ -27,6 +28,7 @@ const InvoiceForm = () => {
         amount: 0
       }
     ],
+    invoiceNumber: '',
     subtotal: 0,
     taxRate: 0,
     taxAmount: 0,
@@ -143,12 +145,12 @@ const InvoiceForm = () => {
           <Row>
             <Col md={6}>
               <h4>Client Details</h4>
-              <button
+              <Button
                 variant="link"
                 onClick={() => setShowClientModal(true)}
               >
                 Select from existing clients
-              </button>
+              </Button>
               <Form.Group>
                 <Form.Label>Name</Form.Label>
                 <Form.Control
@@ -208,6 +210,15 @@ const InvoiceForm = () => {
                   <option value="overdue">Overdue</option>
                 </Form.Control>
               </Form.Group>
+              <Form.Group>
+                <Form.Label>Invoice Number</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="invoicenumber"
+                  value={values.invoiceNumber}
+                  onChange={handleChange}
+                />
+              </Form.Group>
             </Col>
           </Row>
 
@@ -233,7 +244,7 @@ const InvoiceForm = () => {
                     type="number"
                     min="1"
                     name={`items[${index}].quantity`}
-                    value={item.quantity}
+                    value={sanitizeNumber(item.quantity)}
                     onChange={(e) => {
                       handleArrayChange(e);
                       calculateItemAmount(index);
@@ -250,7 +261,7 @@ const InvoiceForm = () => {
                     min="0"
                     step="1"
                     name={`items[${index}].rate`}
-                    value={isNaN(item.rate) ? '' : item.rate}
+                    value={sanitizeNumber(item.rate)}
                     onChange={(e) => {
                       const value = parseFloat(e.target.value) || 0; // Default to 0 if invalid
                       handleArrayChange({
@@ -281,20 +292,20 @@ const InvoiceForm = () => {
               </Col>
               
               <Col md={1} className="d-flex align-items-end">
-                <button
+                <Button
                   variant="danger"
                   size="sm"
                   onClick={() => handleRemoveItem(index)}
                   disabled={values.items.length <= 1}
                 >
                   ×
-                </button>
+                </Button>
               </Col>
             </Row>
           ))}
-          <button variant="secondary" onClick={handleAddItem} className="mb-3">
+          <Button variant="secondary" onClick={handleAddItem} className="mb-3">
             Add Item
-          </button>
+          </Button>
 
           <Row className="mt-3">
             <Col md={{ span: 4, offset: 8 }}>
@@ -314,7 +325,7 @@ const InvoiceForm = () => {
                   min="0"
                   max="100"
                   name="taxRate"
-                  value={isNaN(values.taxRate) ? 0 : values.taxRate}
+                  value={sanitizeNumber(values.taxRate)}
                   onChange={(e) => {
                     const value = parseFloat(e.target.value) || 0;
                     handleChange({
@@ -345,7 +356,7 @@ const InvoiceForm = () => {
                   type="number"
                   min="0"
                   name="discount"
-                  value={values.discount}
+                  value={sanitizeNumber(values.discount)}
                   onChange={(e) => {
                     handleChange(e);
                     calculateTotals({
@@ -378,9 +389,9 @@ const InvoiceForm = () => {
             />
           </Form.Group>
 
-          <button type="submit" variant="primary" className="mt-3">
+          <Button type="submit" variant="primary" className="mt-3">
             {isEdit ? 'Update Invoice' : 'Create Invoice'}
-          </button>
+          </Button>
         </Form>
       </div>
 
@@ -393,10 +404,10 @@ const InvoiceForm = () => {
           <p>Client selection functionality to be implemented</p>
         </Modal.Body>
         <Modal.Footer>
-          <button variant="secondary" onClick={() => setShowClientModal(false)}>
+          <Button variant="secondary" onClick={() => setShowClientModal(false)}>
             Close
-          </button>
-          <button
+          </Button>
+          <Button
             variant="primary"
             onClick={() => {
               // Set selected client logic
@@ -404,7 +415,7 @@ const InvoiceForm = () => {
             }}
           >
             Select Client
-          </button>
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>

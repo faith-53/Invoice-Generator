@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login, register, logout, getMe } from '../services/authService';
+import { login, register, logout } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -10,28 +10,14 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const userData = await getMe();
-        setUser(userData);
-        setIsAuthenticated(true);
-      } catch (error) {
-        setUser(null);
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    checkAuth();
-  }, []);
+  
 
   const loginUser = async (credentials) => {
     try {
       const userData = await login(credentials);
       setUser(userData);
       setIsAuthenticated(true);
-      navigate('/');
+      navigate('/invoices');
     } catch (error) {
       throw error;
     }

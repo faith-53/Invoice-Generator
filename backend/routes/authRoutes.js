@@ -6,7 +6,6 @@ const {handleRegister, handleLogin, handleRefreshToken, getMe, logout} = require
 router.post('/register', handleRegister);
 router.post('/refresh', handleRefreshToken);
 router.post('/login', handleLogin);
-router.get('/me', protect, getMe);
 router.get('/logout', protect, logout);
 
 module.exports = router;

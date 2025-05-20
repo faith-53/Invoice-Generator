@@ -38,7 +38,7 @@ const createInvoice = async (req, res, next) => {
   req.body.user = req.user.id;
 
   // Calculate amounts
-  const { items, taxRate, discount } = req.body;
+  const { items, taxRate, discount, notes, status, client } = req.body;
   
   const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
   const taxAmount = subtotal * (taxRate / 100);
