@@ -27,12 +27,12 @@ const Login = () => {
       navigate('/invoices');
     } catch (error) {
       //showAlert('Invalid credentials');
-      console.error('Login error:', error);
+      console.error('Please check your credentials and try again.', error);
     }
   };
 
   return (
-    <div className="auth-container">
+    <div className="container">
       <Card className="auth-card">
         <Card.Body>
           <h2 className="text-center mb-4">Login</h2>

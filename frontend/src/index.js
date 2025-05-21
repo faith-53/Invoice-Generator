@@ -4,12 +4,15 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import { AuthProvider } from './context/authContext';
+import { InvoiceProvider } from './context/invoiceContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <AuthProvider>
-      <App />
+      <InvoiceProvider>
+        <App />
+      </InvoiceProvider>
     </AuthProvider>,
   </BrowserRouter>
 );

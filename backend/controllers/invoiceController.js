@@ -1,5 +1,5 @@
 const Invoice = require('../models/invoice.js');
-const sendEmail = require('../utils/email.js');
+const sendEmail = require('../config/email.js');
 const generatePDF = require('../utils/generatePDF.js');
 
 // Get all invoices

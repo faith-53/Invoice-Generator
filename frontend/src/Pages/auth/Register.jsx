@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
 
 const Register = () => {
@@ -12,8 +12,9 @@ const Register = () => {
     address: '',
     phone: ''
   });
+  const [alert, setAlert] = useState(null);
   const { registerUser } = useAuth();
-
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setCredentials({
@@ -26,14 +27,15 @@ const Register = () => {
     e.preventDefault();
     try {
       await registerUser(credentials);
+      navigate('/login')
     } catch (error) {
-      //showAlert('Invalid credentials');
-      console.error('Login error:', error);
+      setAlert({ type: 'danger', message: 'Registration failed. Please try again.' });
+      console.error('Registration failed. Please try again.:', error);
     }
   };
 
   return (
-    <div className="auth-container">
+    <div className="container">
       <Card className="auth-card">
         <Card.Body>
           <h2 className="text-center mb-4">Register</h2>
@@ -43,7 +45,7 @@ const Register = () => {
               <Form.Label>Name</Form.Label>
               <Form.Control
                 type="text"
-                name="text"
+                name="name"
                 value={credentials.name}
                 onChange={handleChange}
                 required
@@ -73,7 +75,7 @@ const Register = () => {
               <Form.Label>Company</Form.Label>
               <Form.Control
                 type="text"
-                name="text"
+                name="company"
                 value={credentials.company}
                 onChange={handleChange}
                 required
@@ -83,7 +85,7 @@ const Register = () => {
               <Form.Label>Address</Form.Label>
               <Form.Control
                 type="text"
-                name="text"
+                name="address"
                 value={credentials.address}
                 onChange={handleChange}
                 required
@@ -93,7 +95,7 @@ const Register = () => {
               <Form.Label>Phone</Form.Label>
               <Form.Control
                 type="text"
-                name="text"
+                name="phone"
                 value={credentials.phone}
                 onChange={handleChange}
                 required

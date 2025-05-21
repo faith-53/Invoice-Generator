@@ -1,14 +1,14 @@
 import { Routes, Route } from "react-router-dom";
-import InvoiceItem from "./components/invoices/InvoiceItem";
+import InvoiceItem from "./Pages/invoices/InvoiceItem";
 //import Navbar from "./components/ui/Navbar";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import InvoiceList from "./components/invoices/InvoiceList";
-import InvoiceForm from "./components/invoices/InvoiceForm";
-import Login from "./components/auth/Login";
-import Register from "./components/auth/Register"
+import InvoiceList from "./Pages/invoices/InvoiceList";
+import InvoiceForm from "./Pages/invoices/InvoiceForm";
+import Login from "./Pages/auth/Login";
+import Register from "./Pages/auth/Register"
 import Header from "./components/layout/Header";
-import Home from "./Pages/Home";
+import Home from "./Pages/Home/Home";
 
 
 function App() {

@@ -1,44 +1,67 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login, register, logout } from '../services/authService';
+//import api from '../services/api'; 
+import axios from 'axios';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser ] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  
-
-  const loginUser = async (credentials) => {
+  const loginUser  = async (credentials) => {
+    setIsLoading(true);
     try {
-      const userData = await login(credentials);
-      setUser(userData);
-      setIsAuthenticated(true);
-      navigate('/invoices');
+      const response = await axios.post('http://localhost:5000/api/auth/login', credentials, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      });
+      if (response.data) {
+        localStorage.setItem('token', response.data.token);
+        setUser (response.data.user); 
+        setIsAuthenticated(true);
+        navigate('/invoices');
+      }
+      return response.data;
     } catch (error) {
-      throw error;
+      console.error('Login failed:', error);
+      throw error; 
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const registerUser = async (userData) => {
+  const registerUser  = async (credentials) => {
+    setIsLoading(true);
     try {
-      await register(userData);
+      const response = await axios.post('http://localhost:5000/api/auth/register', credentials, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      });
+   
+      console.log(response.data);
+      navigate('/login');
+      return response.data;
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error; // You might want to handle this differently
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logoutUser  = async () => {
+    try {
+      localStorage.removeItem('token');
+      setUser (null);
+      setIsAuthenticated(false);
       navigate('/login');
     } catch (error) {
-      throw error;
-    }
-  };
-
-  const logoutUser = async () => {
-    try {
-      await logout();
-      setUser(null);
-      setIsAuthenticated(false);
-    navigate('/login');
-    } catch (error) {
+      console.error('Logout failed:', error);
       throw error;
     }
   };
@@ -49,9 +72,9 @@ export const AuthProvider = ({ children }) => {
         user,
         isAuthenticated,
         isLoading,
-        loginUser,
-        registerUser,
-        logoutUser
+        loginUser ,
+        registerUser ,
+        logoutUser 
       }}
     >
       {children}

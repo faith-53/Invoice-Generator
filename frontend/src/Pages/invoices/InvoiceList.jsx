@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {Table, Badge, Form, Row, Col, Spinner} from 'react-bootstrap';
+import { Table, Badge, Form, Row, Col, Spinner, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { getInvoices } from '../../context/invoiceContext';
+import { useInvoice } from '../../context/invoiceContext';
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { getInvoices } = useInvoice();
   const [filters, setFilters] = useState({
     status: 'all',
     fromDate: '',
@@ -16,6 +18,7 @@ const InvoiceList = () => {
     const fetchInvoices = async () => {
       try {
         setLoading(true);
+        setError(null); // Reset error state
         const params = {};
         if (filters.status !== 'all') params.status = filters.status;
         if (filters.fromDate) params.fromDate = filters.fromDate;
@@ -23,14 +26,15 @@ const InvoiceList = () => {
 
         const response = await getInvoices(params);
         setInvoices(response.data);
-        setLoading(false);
       } catch (error) {
-        setLoading(false);
+        setError('Error fetching invoices. Please try again later.');
         console.error('Error fetching invoices:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchInvoices();
-  }, [filters]);
+  }, [filters, getInvoices]);
 
   const handleFilterChange = (e) => {
     setFilters({
@@ -61,6 +65,8 @@ const InvoiceList = () => {
       <div className="card-body">
         <h2 className="mb-4">Invoices</h2>
         
+        {error && <Alert variant="danger">{error}</Alert>}
+
         <Row className="mb-3">
           <Col md={3}>
             <Form.Group>
@@ -123,7 +129,7 @@ const InvoiceList = () => {
                 <tr key={invoice._id}>
                   <td>{invoice.invoiceNumber}</td>
                   <td>{invoice.client.name}</td>
-                  <td>{new Date(invoice.createdAt)}</td>
+                  <td>{new Date(invoice.createdAt).toLocaleDateString()}</td> {/* Format date */}
                   <td>${invoice.total.toFixed(2)}</td>
                   <td>
                     <Badge variant={getStatusBadge(invoice.status)}>
@@ -131,30 +137,18 @@ const InvoiceList = () => {
                     </Badge>
                   </td>
                   <td>
-                    <button
-                      as={Link}
-                      to={`/invoices/${invoice._id}`}
-                      variant="info"
-                      size="sm"
-                      className="mr-2 btn btn-secondary"
-                    >
+                    <Link to={`/invoices/${invoice._id}`} className="btn btn-secondary btn-sm mr-2">
                       View
-                    </button>
-                    <button
-                      as={Link}
-                      to={`/invoices/${invoice._id}/edit`}
-                      variant="secondary"
-                      className='btn btn-secodary'
-                      size="sm"
-                    >
+                    </Link>
+                    <Link to={`/invoices/${invoice._id}/edit`} className='btn btn-secondary btn-sm'>
                       Edit
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center">
+                <td colSpan="6" className="text-center">
                   No invoices found
                 </td>
               </tr>

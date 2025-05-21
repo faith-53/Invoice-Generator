@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const fsPromises = require('fs').promises;
-const path  = require('path')
+const path = require('path');
 
 // Register user
 // @route   POST /api/auth/register
@@ -12,42 +12,47 @@ const handleRegister = async (req, res) => {
     const { name, email, password, company, address, phone } = req.body;
 
     if (!name || !email || !password || !company || !address || !phone) {
-        return res.status(400).json({ success: false, message: 'All fields  are required.' });
-      }
+      return res.status(400).json({ success: false, message: 'All fields are required.' });
+    }
 
-  // Create user
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
     const user = await User.create({
       name,
       email,
-      password,
+      password: hashedPassword, // Save the hashed password
       company,
       address,
       phone
     });
     res.status(201).json({ success: true, message: 'User  registered successfully.' });
-  } catch(error){
-    console.error('Registration error', error)
-    res.status(500).json({success: false, message: 'Server error'})
+  } catch (error) {
+    console.error('Registration error', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
-
 };
 
 // Login user
 // @route   POST /api/auth/login
 const handleLogin = async (req, res) => {
   const { email, password } = req.body;
+
   // Validate email & password
   if (!email || !password) {
     return res.status(400).json({ message: 'Please provide an email and a password' });
   }
+
   try {
     // Check for user
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(400).json({ message: 'User  does not exist' });
     }
+
     // Check if password matches
-    const isMatch = await bcrypt.compare(password, user.password); // Corrected here
+    const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
       const accessToken = jwt.sign(
         { email: user.email },
@@ -59,9 +64,11 @@ const handleLogin = async (req, res) => {
         process.env.REFRESH_TOKEN,
         { expiresIn: '1d' }
       );
-      // Assuming you want to store the refresh token in the database
-      user.refreshToken = refreshToken; // Store refresh token in user document
-      await user.save(); // Save the updated user document
+
+      // Store refresh token in the user document
+      user.refreshToken = refreshToken;
+      await user.save();
+
       // Set the refresh token in a cookie
       res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
       return res.json({ accessToken });
@@ -74,40 +81,35 @@ const handleLogin = async (req, res) => {
   }
 };
 
-// refresh token
+// Refresh token
 // @route   POST /api/auth/refresh
 const handleRefreshToken = async (req, res) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(401);
-  console.log(cookies.jwt)
-  const refreshToken = cookies.jwt
-  
-  // Check for user
-  const user = await User.findOne({ email }).select('+password');
 
-  if (!user) return res.sendStatus(403);
-  
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN,
-    (err, decoded) => {
-        if (err || user.email !== decoded.email) return res.sendStatus(403)
-            const accessToken = jwt.sign(
-                {'email': decoded.email},
-                process.env.ACCESS_TOKEN,
-                {expiresIn: '60s'}
-            );
-            res.json({accessToken})
-    }
-  )
+  const refreshToken = cookies.jwt;
+
+  // Verify the refresh token
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN, async (err, decoded) => {
+    if (err) return res.sendStatus(403);
+
+    // Check for user
+    const user = await User.findOne({ email: decoded.email }).select('+password');
+    if (!user) return res.sendStatus(403);
+
+    const accessToken = jwt.sign(
+      { email: decoded.email },
+      process.env.ACCESS_TOKEN,
+      { expiresIn: '60s' }
+    );
+    res.json({ accessToken });
+  });
 };
-
-
 
 // Log user out / clear cookie
 // @route   GET /api/auth/logout
-const logout = async (req, res, next) => {
-  res.cookie('token', 'none', {
+const logout = async (req, res) => {
+  res.cookie('jwt', 'none', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true
   });

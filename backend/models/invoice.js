@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const items = require('./items');
+
 
 const InvoiceSchema = new mongoose.Schema({
   user: {

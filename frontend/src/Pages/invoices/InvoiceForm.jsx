@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Row, Col, Alert, Spinner, Modal, Button } from 'react-bootstrap';
 import { useForm } from '../../hooks/useForm';
-import { getInvoice, createInvoice, updateInvoice } from '../../context/invoiceContext';
+import { useInvoice } from '../../context/invoiceContext';
 
 const InvoiceForm = () => {
   const { id } = useParams();
@@ -11,6 +11,9 @@ const InvoiceForm = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [showClientModal, setShowClientModal] = useState(false);
   const sanitizeNumber = (val) => (isNaN(val) ? '' : val);
+  const { getInvoice } = useInvoice();
+  const { updateInvoice } = useInvoice();
+  const { createInvoice } = useInvoice();
 
   const { values, setValues, handleChange, handleArrayChange } = useForm({
     client: {
@@ -59,7 +62,7 @@ const InvoiceForm = () => {
     }
     //console.log('Current form values:', values);
     //console.log('Items array:', values.items)
-  }, [id, setValues,values]);
+  }, [id, setValues,values, getInvoice]);
 
   const handleAddItem = () => {
     setValues({
@@ -120,14 +123,14 @@ const InvoiceForm = () => {
       setLoading(true);
       if (isEdit) {
         await updateInvoice(id, values);
-        //showAlert('Invoice updated successfully', 'success');
+        console.log('Invoice updated successfully', 'success');
       } else {
         await createInvoice(values);
-        //showAlert('Invoice created successfully', 'success');
+        console.log('Invoice created successfully', 'success');
       }
       navigate('/invoices');
     } catch (error) {
-      //showAlert('Failed to save invoice');
+      console.log('Failed to save invoice');
       setLoading(false);
     }
   };
@@ -214,11 +217,11 @@ const InvoiceForm = () => {
                 <Form.Label>Invoice Number</Form.Label>
                 <Form.Control
                   type="text"
-                  name="invoicenumber"
-                  value={values.invoiceNumber}
-                  onChange={handleChange}
+                  name="invoiceNumber"
+                  value={values.invoiceNumber} // Controlled value
+                  onChange={handleChange} // Update state on change
                 />
-              </Form.Group>
+            </Form.Group>
             </Col>
           </Row>
 
