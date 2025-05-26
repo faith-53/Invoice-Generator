@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser');
 // Import routes
 const authRoutes = require('./routes/authRoutes.js');
 const invoiceRoutes = require('./routes/invoiceRoutes.js');
-const clientRoutes = require('./routes/clientRoutes.js'); 
 const connectDB = require('./config/db.js');
 
 // Initialize app
@@ -28,7 +27,7 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/invoices', invoiceRoutes);
-app.use('/api/clients', clientRoutes); // Use a router for clients
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

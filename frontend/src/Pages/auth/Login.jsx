@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Card, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
-
+import { toast } from 'react-toastify'
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,16 +20,18 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await loginUser(credentials);
-      navigate('/invoices');
-    } catch (error) {
-      //showAlert('Invalid credentials');
-      console.error('Please check your credentials and try again.', error);
-    }
-  };
+  // Login.jsx
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await loginUser(credentials); // ✅ no need to pass headers here
+    navigate('/invoices');
+  } catch (error) {
+    toast.error('Please check your credentials and try again.');
+    console.error(error);
+  }
+};
+
 
   return (
     <div className="container">

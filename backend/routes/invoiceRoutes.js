@@ -27,6 +27,6 @@ router.route('/:id/download')
     .get(protect, downloadInvoice);  // Download a specific invoice
 
 router.route('/:id/send')
-    .post(protect, sendInvoice);     // Send a specific invoice
+    .post(protect,sendInvoice);     // Send a specific invoice
 
 module.exports = router; // Use CommonJS export

@@ -1,45 +1,23 @@
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const User = require('../models/user.js');
+const jwt = require('jsonwebtoken');
 
 // Protect routes
 const protect = async (req, res, next) => {
-  let token;
-
-  // Check for token in authorization header or cookies
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookies && req.cookies.jwt) { // Ensure the cookie name matches
-    token = req.cookies.jwt;
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+  if (!authHeader?.startsWith('Bearer')) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
-
-  // Make sure token exists
-  if (!token) {
-    return res.status(401).json({ message: 'Not authorized, no token' });
-  }
-
-  try {
-    // Verify token
-    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN); // Use the correct secret
-
-    // Find user by ID
-    req.user = await User.findById(decoded.id);
-
-    // Check if user exists
-    if (!req.user) {
-      return res.status(404).json({ message: 'User  not found' });
-    }
-
+  
+  const token = authHeader.split(' ')[1];
+  
+  // Verify the token using the single secret
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ message: 'Forbidden' });
+    
+    // Attach the user information to the request object
+    req.user = decoded.email; // or req.user = decoded; if you want to attach the entire decoded object
     next();
-  } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(403).json({ message: 'Token has expired' });
-    }
-    return res.status(403).json({ message: 'Not authorized, token invalid' });
-  }
+  });
 };
 
 module.exports = {

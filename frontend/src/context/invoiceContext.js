@@ -1,5 +1,4 @@
 import React, { createContext, useState } from 'react';
-import axios from 'axios';
 import api from '../services/api';
 
 const InvoiceContext = createContext();
@@ -13,7 +12,7 @@ export const InvoiceProvider = ({ children }) => {
   const getInvoices = async (params = {}) => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/invoices', { params });
+      const response = await api.get('/api/invoices', { params });
       setInvoices(response.data); // Store the list of invoices
       setError(null);
     } catch (err) {
@@ -41,7 +40,7 @@ export const InvoiceProvider = ({ children }) => {
   // Create invoice
   const createInvoice = async (invoiceData) => {
     try {
-      const response =  await axios.post('http://localhost:5000/api/invoices/', invoiceData); // Pass invoiceData
+      const response =  await api.post('/api/invoices/', invoiceData); // Pass invoiceData
       await getInvoices(); // Refresh the list of invoices
       return response.data; // Return the created invoice
     } catch (error) {

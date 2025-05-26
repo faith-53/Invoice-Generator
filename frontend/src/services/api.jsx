@@ -1,7 +1,8 @@
 import axios from 'axios';
+console.log('API base URL:', process.env.REACT_APP_BASE_URL);
 
 const api = axios.create({
-  baseURL: process.env.BASE_URL,
+  baseURL: process.env.REACT_APP_BASE_URL,
 });
 
 // Add a request interceptor to include the auth token
@@ -12,5 +13,6 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
 
 export default api;

@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Badge, Form, Row, Col, Spinner, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useInvoice } from '../../context/invoiceContext';
 
 const InvoiceList = () => {
-  const [invoices, setInvoices] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { getInvoices } = useInvoice();
+  const { invoices, getInvoices, loading, error } = useInvoice(); // Use invoices from context
   const [filters, setFilters] = useState({
     status: 'all',
     fromDate: '',
@@ -17,20 +14,14 @@ const InvoiceList = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        setLoading(true);
-        setError(null); // Reset error state
         const params = {};
         if (filters.status !== 'all') params.status = filters.status;
         if (filters.fromDate) params.fromDate = filters.fromDate;
         if (filters.toDate) params.toDate = filters.toDate;
 
-        const response = await getInvoices(params);
-        setInvoices(response.data);
+        await getInvoices(params); // Call getInvoices without expecting a return value
       } catch (error) {
-        setError('Error fetching invoices. Please try again later.');
         console.error('Error fetching invoices:', error);
-      } finally {
-        setLoading(false);
       }
     };
     fetchInvoices();
@@ -129,7 +120,7 @@ const InvoiceList = () => {
                 <tr key={invoice._id}>
                   <td>{invoice.invoiceNumber}</td>
                   <td>{invoice.client.name}</td>
-                  <td>{new Date(invoice.createdAt).toLocaleDateString()}</td> {/* Format date */}
+                  <td>{new Date(invoice.createdAt).toLocaleDateString()}</td>
                   <td>${invoice.total.toFixed(2)}</td>
                   <td>
                     <Badge variant={getStatusBadge(invoice.status)}>

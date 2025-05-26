@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
+import { toast } from 'react-toastify'
 
 const Register = () => {
   const [credentials, setCredentials] = useState({
@@ -23,16 +24,17 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await registerUser(credentials);
-      navigate('/login')
-    } catch (error) {
-      setAlert({ type: 'danger', message: 'Registration failed. Please try again.' });
-      console.error('Registration failed. Please try again.:', error);
-    }
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await registerUser(credentials); 
+    navigate('/login');
+  } catch (error) {
+    toast.error('Registration failed. Please try again.');
+    console.error(error);
+  }
+};
+
 
   return (
     <div className="container">

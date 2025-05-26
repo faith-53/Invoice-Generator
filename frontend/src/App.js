@@ -9,12 +9,15 @@ import Login from "./Pages/auth/Login";
 import Register from "./Pages/auth/Register"
 import Header from "./components/layout/Header";
 import Home from "./Pages/Home/Home";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'
 
 
 function App() {
   return (
     <div>
       <Header />
+      <ToastContainer />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -22,7 +25,6 @@ function App() {
           <Route path="/invoices" element={<InvoiceList />} />
           <Route path="/invoice/:invoiceId" element={<InvoiceItem />} />
           <Route path="/invoices/new" element={<InvoiceForm />} />
-          
         </Routes>
     </div>
   );

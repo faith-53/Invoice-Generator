@@ -4,8 +4,14 @@ const generatePDF = require('../utils/generatePDF.js');
 
 // Get all invoices
 // @route   GET /api/invoices
-const getInvoices = async (req, res, next) => {
-  res.status(200).json(res.advancedResults);
+const getInvoices = async (req, res) => {
+  try {
+    let query = {};
+    const invoices = await Invoice.find(query);
+    res.status(200).json(invoices);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
 //Get single invoice
