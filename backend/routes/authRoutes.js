@@ -1,12 +1,12 @@
 const express = require('express');
-const router = express.Router();
+const authRoutes = express.Router();
 const { protect } = require('../middlewares/auth.js');
 const {handleRegister, handleLogin, handleRefreshToken, logout, sendTokenResponse} = require('../controllers/authController.js');
 
-router.post('/register', handleRegister);
-router.post('/refresh', handleRefreshToken);
-router.post('/token', sendTokenResponse);
-router.post('/login', handleLogin);
-router.get('/logout', protect, logout);
+authRoutes.post('/register', handleRegister);
+authRoutes.post('/refresh', handleRefreshToken);
+authRoutes.post('/token', sendTokenResponse);
+authRoutes.post('/login', handleLogin);
+authRoutes.get('/logout', protect, logout);
 
-module.exports = router;
+module.exports = authRoutes;

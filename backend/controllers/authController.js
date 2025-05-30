@@ -31,9 +31,9 @@ const handleRegister = async (req, res) => {
 
     // Assign jwt
     const token = jwt.sign(
-      { email: user.email },
+      { id: user._id },
       process.env.JWT_SECRET, // Use a single secret for signing the token
-      { expiresIn: '1d' } // Token expiration time
+      { expiresIn: '10m' } // Token expiration time
     );
 
     res.status(201).json({ success: true, message: 'User  registered successfully.', token });
@@ -66,9 +66,9 @@ const handleLogin = asyncHandler(async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' }); 
     } else {
       const token = jwt.sign(
-        { email: user.email },
+        { id: user._id },
         process.env.JWT_SECRET, 
-        { expiresIn: '1d' } // Token expiration time
+        { expiresIn: '10m' } // Token expiration time
       );
 
       // Set the token in a cookie
@@ -99,11 +99,11 @@ const handleRefreshToken = async (req, res) => {
     if (err) return res.status(403).json({ message: 'Forbidden' });
 
     // Check for user
-    const user = await User.findOne({ email: decoded.email }).select('+password');
+    const user = await User.findById(decoded.id).select('+password');
     if (!user) return res.status(401).json({ message: 'Unauthorized' });
 
     const newToken = jwt.sign(
-      { email: decoded.email },
+      { id: decoded.id },
       process.env.JWT_SECRET, // Use a single secret for signing the token
       { expiresIn: '1d' } // Token expiration time
     );
@@ -127,7 +127,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 
   const options = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+      Date.now() + 7 * 24 * 60 * 60 * 1000
     ),
     httpOnly: true
   };

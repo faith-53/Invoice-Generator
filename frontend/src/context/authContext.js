@@ -75,7 +75,7 @@ const registerUser = async (credentials) => {
   } finally {
     setIsLoading(false);
   }
-};
+  };
 
   const logoutUser  = async () => {
     try {

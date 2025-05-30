@@ -1,5 +1,6 @@
 import React, { createContext, useState } from 'react';
 import api from '../services/api';
+import { toast } from "react-toastify"
 
 const InvoiceContext = createContext();
 
@@ -7,23 +8,24 @@ export const InvoiceProvider = ({ children }) => {
   const [invoices, setInvoices] = useState([]); // Changed to manage a list of invoices
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  
   // Get all invoices
   const getInvoices = async (params = {}) => {
-    try {
-      setLoading(true);
-      const response = await api.get('/api/invoices', { params });
-      setInvoices(response.data); // Store the list of invoices
-      setError(null);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch invoices');
-      console.error('Error fetching invoices:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const response = await api.get('/api/invoices/list', { params });
+    setInvoices(response.data);
+    setError(null);
+  } catch (err) {
+    setError(err.response?.data?.message || 'Failed to fetch invoices');
+    console.error('Error fetching invoices:', err);
+    toast.error('Failed to fetch invoices');
+  } finally {
+    setLoading(false);
+  }
+};
 
-  // Get single invoice
+// Get single invoice
   const getInvoice = async (id) => {
     try {
       setLoading(true);
@@ -40,7 +42,8 @@ export const InvoiceProvider = ({ children }) => {
   // Create invoice
   const createInvoice = async (invoiceData) => {
     try {
-      const response =  await api.post('/api/invoices/', invoiceData); // Pass invoiceData
+      
+      const response = await api.post('/api/invoices/create', invoiceData);; // Pass invoiceData
       await getInvoices(); // Refresh the list of invoices
       return response.data; // Return the created invoice
     } catch (error) {
@@ -52,7 +55,7 @@ export const InvoiceProvider = ({ children }) => {
   // Update invoice
   const updateInvoice = async (invoiceId, invoiceData) => {
     try {
-      const response = await api.put(`/api/invoices/${invoiceId}`, invoiceData);
+      const response = await api.put(`/api/invoices/update/${invoiceId}`, invoiceData);
       await getInvoices(); // Refresh the list of invoices
       return response.data; // Return the updated invoice
     } catch (error) {
@@ -64,7 +67,7 @@ export const InvoiceProvider = ({ children }) => {
   // Delete invoice
   const deleteInvoice = async (id) => {
     try {
-      await api.delete(`/api/invoices/${id}`);
+      await api.delete(`/api/invoices/delete/${id}`);
       await getInvoices(); // Refresh the list of invoices
     } catch (error) {
       console.error("Error deleting invoice:", error.response ? error.response.data : error.message);
@@ -74,20 +77,14 @@ export const InvoiceProvider = ({ children }) => {
 
   // Download invoice as PDF
   const downloadInvoice = async (invoiceId) => {
-    const token = localStorage.getItem('token');
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      responseType: 'blob'
-    };
-    const response = await api.get(`/api/invoices/${invoiceId}/download`, config);
+    
+    const response = await api.get(`/api/invoices/download/${invoiceId}/download`);
     return response.data;
   };
 
   // Send invoice via email
   const sendInvoice = async (invoiceId) => {
-    const response = await api.post(`/api/invoices/${invoiceId}/send`);
+    const response = await api.post(`/api/invoices/send/${invoiceId}/send`);
     return response.data;
   };
 

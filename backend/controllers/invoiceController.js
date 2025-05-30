@@ -3,20 +3,29 @@ const sendEmail = require('../config/email.js');
 const generatePDF = require('../utils/generatePDF.js');
 
 // Get all invoices
-// @route   GET /api/invoices
+// @route   GET /api/invoices/list
 const getInvoices = async (req, res) => {
   try {
-    let query = {};
-    const invoices = await Invoice.find(query);
+    console.log('Request user:', req.user);
+    // Make sure req.user exists (should be set by protect middleware)
+    if (!req.user) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    // Get invoices for the authenticated user
+    const invoices = await Invoice.find({ user: req.user._id });
+    
     res.status(200).json(invoices);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    console.error('Error getting invoices:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
 //Get single invoice
 // @route   GET /api/invoices/:id
 const getInvoice = async (req, res, next) => {
+  req.body.user = req.user.id;
   const invoice = await Invoice.findById(req.params.id).populate({
     path: 'user',
     select: 'name email company address phone'
@@ -66,6 +75,7 @@ const createInvoice = async (req, res, next) => {
 // @route   PUT /api/invoices/:id
 
 const updateInvoice = async (req, res, next) => {
+  req.body.user = req.user.id;
   let invoice = await Invoice.findById(req.params.id);
 
   if (!invoice) {
@@ -103,6 +113,7 @@ const updateInvoice = async (req, res, next) => {
 // Delete invoice
 // @route   DELETE /api/invoices/:id
 const deleteInvoice = async (req, res, next) => {
+  req.body.user = req.user.id;
   const invoice = await Invoice.findById(req.params.id);
 
   if (!invoice) {
@@ -125,6 +136,7 @@ const deleteInvoice = async (req, res, next) => {
 //Download invoice as PDF
 // @route   GET /api/invoices/:id/download
 const downloadInvoice = async (req, res, next) => {
+  req.body.user = req.user.id;
   const invoice = await Invoice.findById(req.params.id).populate({
     path: 'user',
     select: 'name email company address phone'
@@ -158,6 +170,7 @@ const downloadInvoice = async (req, res, next) => {
 // @route   POST /api/invoices/:id/send
 // @access  Private
 const sendInvoice = async (req, res, next) => {
+  req.body.user = req.user.id;
   const invoice = await Invoice.findById(req.params.id).populate({
     path: 'user',
     select: 'name email company address phone'

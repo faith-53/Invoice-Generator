@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Form, Button, Card, Alert } from 'react-bootstrap';
+import { useState } from 'react';
+import { Form, Button, Card, Alert, Container } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
 import { toast } from 'react-toastify'
@@ -24,26 +24,33 @@ const Register = () => {
     });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    await registerUser(credentials); 
-    navigate('/login');
-  } catch (error) {
-    toast.error('Registration failed. Please try again.');
-    console.error(error);
-  }
-};
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await registerUser(credentials); 
+      navigate('/login');
+    } catch (error) {
+      toast.error('Registration failed. Please try again.');
+      console.error(error);
+    }
+  };
 
   return (
-    <div className="container">
-      <Card className="auth-card">
+    <Container 
+      className="mt-5 mb-5" 
+      style={{
+        minHeight: 'calc(150vh - 120px)', // Adjust based on navbar/footer height
+        overflowY: 'auto',
+        paddingTop: '20px',
+        paddingBottom: '20px'
+      }}
+    >
+      <Card className="mx-auto" style={{ maxWidth: '600px' }}>
         <Card.Body>
           <h2 className="text-center mb-4">Register</h2>
           {alert && <Alert variant={alert.type}>{alert.message}</Alert>}
           <Form onSubmit={handleSubmit}>
-            <Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>Name</Form.Label>
               <Form.Control
                 type="text"
@@ -53,7 +60,7 @@ const handleSubmit = async (e) => {
                 required
               />
             </Form.Group>
-            <Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
@@ -63,7 +70,7 @@ const handleSubmit = async (e) => {
                 required
               />
             </Form.Group>
-            <Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"
@@ -73,7 +80,7 @@ const handleSubmit = async (e) => {
                 required
               />
             </Form.Group>
-            <Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>Company</Form.Label>
               <Form.Control
                 type="text"
@@ -83,7 +90,7 @@ const handleSubmit = async (e) => {
                 required
               />
             </Form.Group>
-            <Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>Address</Form.Label>
               <Form.Control
                 type="text"
@@ -93,7 +100,7 @@ const handleSubmit = async (e) => {
                 required
               />
             </Form.Group>
-            <Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label>Phone</Form.Label>
               <Form.Control
                 type="text"
@@ -104,15 +111,15 @@ const handleSubmit = async (e) => {
               />
             </Form.Group>
             <Button type="submit" className="w-100 mt-3">
-              Register
+              Create Account
             </Button>
           </Form>
           <div className="w-100 text-center mt-3">
-            <Link to="/login">Already have an account? Login</Link>
+            <p>Already have an account? <Link to="/login">Login</Link></p>
           </div>
         </Card.Body>
       </Card>
-    </div>
+    </Container>
   );
 };
 

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Form, Card, Alert } from 'react-bootstrap';
+import { useState } from 'react';
+import { Form, Card, Container } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
 import { toast } from 'react-toastify'
@@ -20,25 +20,33 @@ const Login = () => {
     });
   };
 
-  // Login.jsx
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    await loginUser(credentials); // ✅ no need to pass headers here
-    navigate('/invoices');
-  } catch (error) {
-    toast.error('Please check your credentials and try again.');
-    console.error(error);
-  }
-};
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await loginUser(credentials); // ✅ no need to pass headers here
+      navigate('/invoices');
+    } catch (error) {
+      toast.error('Please check your credentials and try again.');
+      console.error(error);
+    }
+  };
 
 
   return (
-    <div className="container">
-      <Card className="auth-card">
+    <Container 
+          className="mt-5" 
+          style={{
+            minHeight: 'calc(100vh - 120px)', 
+            overflowY: 'auto',
+            paddingTop: '20px',
+            paddingBottom: '20px'
+          }}
+        >
+      <Card className="auth-card mx-auto">
         <Card.Body>
           <h2 className="text-center mb-4">Login</h2>
-          {alert && <Alert variant={alert.type}>{alert.message}</Alert>}
+          
           <Form onSubmit={handleSubmit}>
             <Form.Group>
               <Form.Label>Email</Form.Label>
@@ -69,7 +77,7 @@ const handleSubmit = async (e) => {
           </div>
         </Card.Body>
       </Card>
-    </div>
+    </Container>
   );
 };
 

@@ -38,24 +38,24 @@ const InvoiceSchema = new mongoose.Schema({
       trim: true
     }
   },
-  items: {
+  items: [{
     description: {
-            type: String,
-            required: [true, 'Please add item description']
-        },
-        quantity: {
-            type: Number,
-            required: [true, 'Please add item quantity']
-        },
-        rate: {
-            type: Number,
-            required: [true, 'Please add item rate']
-        },
-        amount: {
-            type: Number,
-            required: [true, 'Please add item amount']
-        }
-  },
+      type: String,
+      required: [true, 'Please add item description']
+    },
+    quantity: {
+      type: Number,
+      required: [true, 'Please add item quantity']
+    },
+    rate: {
+      type: Number,
+      required: [true, 'Please add item rate']
+    },
+    amount: {
+      type: Number,
+      required: [true, 'Please add item amount']
+    }
+  }],
   subtotal: {
     type: Number,
     required: true
@@ -104,3 +104,4 @@ InvoiceSchema.pre('save', async function(next) {
 });
 
 module.exports = mongoose.model('invoice', InvoiceSchema);
+

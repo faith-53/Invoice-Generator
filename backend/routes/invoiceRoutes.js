@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const invoiceRoutes = express.Router();
 const { protect } = require('../middlewares/auth');
 const {
     getInvoices,
@@ -11,22 +11,12 @@ const {
     sendInvoice
 } = require('../controllers/invoiceController');
 
-// Route for getting and creating invoices
-router.route('/')
-    .get(protect, getInvoices)      // Get all invoices
-    .post(protect, createInvoice);  // Create a new invoice
+invoiceRoutes.get('/list',protect ,getInvoices);
+invoiceRoutes.post('/create', protect,createInvoice);
+invoiceRoutes.get('/:id',protect, getInvoice);
+invoiceRoutes.post('/update/:id',protect, updateInvoice);
+invoiceRoutes.post('/delete/:id', protect, deleteInvoice);
+invoiceRoutes.get('/download/:id', protect, downloadInvoice);
+invoiceRoutes.get('/send/:id', protect, sendInvoice);
 
-// Route for handling specific invoice by ID
-router.route('/:id')
-    .get(protect, getInvoice)       // Get a specific invoice
-    .put(protect, updateInvoice)     // Update a specific invoice
-    .delete(protect, deleteInvoice); // Delete a specific invoice
-
-// Route for downloading and sending invoices
-router.route('/:id/download')
-    .get(protect, downloadInvoice);  // Download a specific invoice
-
-router.route('/:id/send')
-    .post(protect,sendInvoice);     // Send a specific invoice
-
-module.exports = router; // Use CommonJS export
+module.exports = invoiceRoutes; 
