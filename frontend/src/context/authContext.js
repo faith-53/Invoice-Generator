@@ -1,8 +1,10 @@
-import React, { createContext, useState } from 'react';
+import { jwtDecode } from 'jwt-decode'; 
+import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api'; 
 import axios from 'axios';
 import { toast } from 'react-toastify';
+
 
 const AuthContext = createContext();
 
@@ -12,6 +14,25 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : '');
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const decoded = jwtDecode(token);
+        const response = await api.get('/api/auth/me'); // token added via interceptor
+        setUser(response.data); // full user object: name, email, etc.
+      } catch (err) {
+        console.error('Failed to fetch user profile:', err);
+        setUser(null);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
 
   
 const loginUser = async (credentials) => {

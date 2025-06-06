@@ -14,9 +14,9 @@ const {
 invoiceRoutes.get('/list',protect ,getInvoices);
 invoiceRoutes.post('/create', protect,createInvoice);
 invoiceRoutes.get('/:id',protect, getInvoice);
-invoiceRoutes.post('/update/:id',protect, updateInvoice);
+invoiceRoutes.put('/update/:id',protect, updateInvoice);
 invoiceRoutes.post('/delete/:id', protect, deleteInvoice);
 invoiceRoutes.get('/download/:id', protect, downloadInvoice);
-invoiceRoutes.get('/send/:id', protect, sendInvoice);
+invoiceRoutes.post('/send/:id', protect, sendInvoice);
 
 module.exports = invoiceRoutes; 

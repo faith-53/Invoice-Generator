@@ -45,46 +45,39 @@ const handleRegister = async (req, res) => {
 
 // Login user
 // @route   POST /api/auth/login
-const handleLogin = asyncHandler(async (req, res) => {
+const handleLogin = async (req, res) => {
   const { email, password } = req.body;
 
-  // Validate email & password
   if (!email || !password) {
-    return res.status(400).json({ message: 'Please provide an email and a password' });
+    return res.status(400).json({ message: 'Please provide email and password' });
   }
 
   try {
-    // Check for user
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      return res.status(400).json({ message: 'User  does not exist' });
+      return res.status(404).json({ message: 'User does not exist' });
     }
 
-    // Check if password matches
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' }); 
-    } else {
-      const token = jwt.sign(
-        { id: user._id },
-        process.env.JWT_SECRET, 
-        { expiresIn: '10m' } // Token expiration time
-      );
-
-      // Set the token in a cookie
-      res.cookie('jwt', token, 
-        { httpOnly: true, 
-          sameSite: 'None', 
-          secure: true, 
-          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        });
-      res.json({ success: true, token }); 
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
+
+    const token = jwt.sign(
+      { id: user._id }, // ✅ use user ID
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    res.status(200).json({
+      success: true,
+      token // ✅ only return the token
+    });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Server error' });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
-});
+};
 
 // Refresh token
 // @route   POST /api/auth/refresh
@@ -145,10 +138,28 @@ const sendTokenResponse = (user, statusCode, res) => {
     });
 };
 
+// @route   GET /api/auth/me
+// @desc    Get current logged-in user
+// @access  Private
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
+  } catch (err) {
+    console.error('Error fetching user profile:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
 module.exports = {
   handleRegister,
   handleRefreshToken,
   handleLogin,
   logout,
   sendTokenResponse,
+  getMe,
 };

@@ -6,7 +6,7 @@ const Home = () => {
     <div className="container text-center py-5">
       <div className="row align-items-center">
         <div className="col-md-6">
-          <h1 className="display-4 fw-bold">Welcome to Invoice Generator</h1>
+          <h1 className="display-4 fw-bold">Welcome to InvoicePro</h1>
           <p className="lead mt-4">
             Create, manage, and send professional invoices in seconds. Simple. Fast. Free.
           </p>

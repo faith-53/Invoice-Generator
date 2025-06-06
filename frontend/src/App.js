@@ -14,18 +14,21 @@ import InvoicePreview from "./Pages/invoices/InvoicePreview";
 
 function App() {
   return (
-    <div>
+    <div className="app-container">
       <Navbar />
       <ToastContainer />
+      <main className="main-content container">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Home />} />
-          <Route path="/invoices" element={<InvoiceList />} />
-          <Route path="/invoice/:invoiceId" element={<InvoicePreview />} />
           <Route path="/invoices/new" element={<InvoiceForm />} />
+          <Route path="/invoices/:id/edit" element={<InvoiceForm />} />
+          <Route path="/invoices/:id" element={<InvoicePreview />} />
+          <Route path="/invoices" element={<InvoiceList />} />
         </Routes>
-        <Footer />
+      </main>
+      <Footer className="footer" />
     </div>
   );
 }

@@ -25,12 +25,16 @@ function generateHeader(doc, invoice) {
   doc
     .fillColor('#444444')
     .fontSize(20)
-    .text(invoice.user.company, 50, 50)
+    .text(invoice.user.company || 'Company Name', 50, 50)
     .fontSize(10)
-    .text(invoice.user.address, 50, 70)
-    .text(`Phone: ${invoice.user.phone}`, 50, 85)
+    .text(invoice.user.address || 'No address provided', 50, 70)
+    .text(`Phone: ${invoice.user.phone || 'Not provided'}`, 50, 85)
     .text(`Email: ${invoice.user.email}`, 50, 100)
     .moveDown();
+
+  // Format dates
+  const createdDate = invoice.createdAt ? new Date(invoice.createdAt).toLocaleDateString() : 'Not specified';
+  const dueDate = invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'Not specified';
 
   // Invoice title and number
   doc
@@ -38,8 +42,8 @@ function generateHeader(doc, invoice) {
     .text('INVOICE', 200, 50, { align: 'right' })
     .fontSize(10)
     .text(`Invoice Number: ${invoice.invoiceNumber}`, 200, 70, { align: 'right' })
-    .text(`Invoice Date: ${new Date(invoice.createdAt).toLocaleDateString()}`, 200, 85, { align: 'right' })
-    .text(`Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}`, 200, 100, { align: 'right' })
+    .text(`Invoice Date: ${createdDate}`, 200, 85, { align: 'right' })
+    .text(`Due Date: ${dueDate}`, 200, 100, { align: 'right' })
     .moveDown();
 }
 
@@ -49,10 +53,10 @@ function generateCustomerInformation(doc, invoice) {
     .fontSize(20)
     .text('Bill To:', 50, 150)
     .fontSize(10)
-    .text(invoice.client.name, 50, 170)
-    .text(invoice.client.address, 50, 185)
+    .text(invoice.client.name || 'Client Name', 50, 170)
+    .text(invoice.client.address || 'No address provided', 50, 185)
     .text(`Email: ${invoice.client.email}`, 50, 200)
-    .text(`Phone: ${invoice.client.phone}`, 50, 215)
+    .text(`Phone: ${invoice.client.phone || 'Not provided'}`, 50, 215)
     .moveDown();
 }
 

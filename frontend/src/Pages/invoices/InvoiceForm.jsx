@@ -8,12 +8,13 @@ const InvoiceForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
   const [showClientModal, setShowClientModal] = useState(false);
   const sanitizeNumber = (val) => (isNaN(val) ? '' : val);
-  const { getInvoice } = useInvoice();
-  const { updateInvoice } = useInvoice();
-  const { createInvoice } = useInvoice();
+  const { getInvoice, updateInvoice, createInvoice } = useInvoice();
+
+  console.log('Form mounted with ID:', id); // Debug log
 
   const { values, setValues, handleChange, handleArrayChange } = useForm({
     client: {
@@ -43,26 +44,35 @@ const InvoiceForm = () => {
 
   useEffect(() => {
     if (id) {
+      console.log('Fetching invoice for edit:', id); // Debug log
       setIsEdit(true);
-      const fetchInvoice = async () => {
-        try {
-          setLoading(true);
-          const invoice = await getInvoice(id);
-          setValues({
-            ...invoice.data,
-            
-          });
-          setLoading(false);
-        } catch (error) {
-          //showAlert('Failed to load invoice');
-          setLoading(false);
-        }
-      };
       fetchInvoice();
     }
-    //console.log('Current form values:', values);
-    //console.log('Items array:', values.items)
-  }, [id, setValues,values, getInvoice]);
+  }, [id]);
+
+  const fetchInvoice = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('Making API call to fetch invoice:', id); // Debug log
+      const response = await getInvoice(id);
+      console.log('Received invoice data:', response); // Debug log
+      
+      if (response && response.data) {
+        setValues({
+          ...response.data,
+        });
+        console.log('Updated form values:', response.data); // Debug log
+      } else {
+        throw new Error('No invoice data received');
+      }
+    } catch (error) {
+      console.error('Error fetching invoice:', error);
+      setError(error.message || 'Failed to load invoice');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddItem = () => {
     setValues({
@@ -136,14 +146,26 @@ const InvoiceForm = () => {
   };
 
   if (loading) {
-    return <Spinner animation="border" />;
+    return (
+      <div className="text-center mt-5">
+        <Spinner animation="border" />
+        <p>Loading invoice data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="danger" className="mt-3">
+        {error}
+      </Alert>
+    );
   }
 
   return (
-    <div className='card'>
+    <div className='card mb-5'>
       <div className='card-body'>
         <h2 className="mb-4">{isEdit ? 'Edit Invoice' : 'New Invoice'}</h2>
-        {alert && <Alert variant={alert.type}>{alert.message}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col md={6}>
@@ -155,8 +177,9 @@ const InvoiceForm = () => {
                 Select from existing clients
               </Button>
               <Form.Group>
-                <Form.Label>Name</Form.Label>
+                <Form.Label htmlFor='name'>Name</Form.Label>
                 <Form.Control
+                id='name'
                   type="text"
                   name="client.name"
                   value={values.client.name}
@@ -165,8 +188,9 @@ const InvoiceForm = () => {
                 />
               </Form.Group>
               <Form.Group>
-                <Form.Label>Email</Form.Label>
+                <Form.Label htmlFor='email'>Email</Form.Label>
                 <Form.Control
+                id='rmail'
                   type="email"
                   name="client.email"
                   value={values.client.email}
@@ -175,8 +199,9 @@ const InvoiceForm = () => {
                 />
               </Form.Group>
               <Form.Group>
-                <Form.Label>Address</Form.Label>
+                <Form.Label htmlFor='address'>Address</Form.Label>
                 <Form.Control
+                id='address'
                   as="textarea"
                   rows={3}
                   name="client.address"
@@ -186,8 +211,9 @@ const InvoiceForm = () => {
                 />
               </Form.Group>
               <Form.Group>
-                <Form.Label>Phone</Form.Label>
+                <Form.Label htmlFor='phone'>Phone</Form.Label>
                 <Form.Control
+                id='phone'
                   type="text"
                   name="client.phone"
                   value={values.client.phone}
@@ -199,8 +225,9 @@ const InvoiceForm = () => {
               <h4>Invoice Details</h4>
               
               <Form.Group>
-                <Form.Label>Status</Form.Label>
+                <Form.Label htmlFor='status'>Status</Form.Label>
                 <Form.Control
+                id='status'
                   as="select"
                   name="status"
                   value={values.status}
@@ -214,8 +241,9 @@ const InvoiceForm = () => {
                 </Form.Control>
               </Form.Group>
               <Form.Group>
-                <Form.Label>Invoice Number</Form.Label>
+                <Form.Label htmlFor='invoiceNumber'>Invoice Number</Form.Label>
                 <Form.Control
+                id='invoiceNumber'
                   type="text"
                   name="invoiceNumber"
                   value={values.invoiceNumber} // Controlled value
@@ -230,8 +258,9 @@ const InvoiceForm = () => {
             <Row key={index} className="mb-3">
               <Col md={5}>
                 <Form.Group>
-                  <Form.Label>Description</Form.Label>
+                  <Form.Label htmlFor='description'>Description</Form.Label>
                   <Form.Control
+                  id='description'
                     type="text"
                     name={`items[${index}].description`}
                     value={item.description}
@@ -242,8 +271,9 @@ const InvoiceForm = () => {
               </Col>
               <Col md={2}>
                 <Form.Group>
-                  <Form.Label>Quantity</Form.Label>
+                  <Form.Label htmlFor='quantity'>Quantity</Form.Label>
                   <Form.Control
+                  id='quantiyt'
                     type="number"
                     min="1"
                     name={`items[${index}].quantity`}
@@ -258,8 +288,9 @@ const InvoiceForm = () => {
               </Col>
               <Col md={2}>
                 <Form.Group>
-                  <Form.Label>Rate</Form.Label>
+                  <Form.Label htmlFor='rate'>Rate</Form.Label>
                   <Form.Control
+                  id='rate'
                     type="number"
                     min="0"
                     step="1"
@@ -282,8 +313,9 @@ const InvoiceForm = () => {
 
               <Col md={2}>
                 <Form.Group>
-                  <Form.Label>Amount</Form.Label>
+                  <Form.Label htmlFor='amount'>Amount</Form.Label>
                   <Form.Control
+                  id='amount'
                     type="number"
                     min="0"
                     step="0.01"
@@ -313,8 +345,9 @@ const InvoiceForm = () => {
           <Row className="mt-3">
             <Col md={{ span: 4, offset: 8 }}>
               <Form.Group>
-                <Form.Label>Subtotal</Form.Label>
+                <Form.Label htmlFor='subtotal'>Subtotal</Form.Label>
                 <Form.Control
+                id='subtotal'
                   type="number"
                   name="subtotal"
                   value={values.subtotal}
@@ -322,8 +355,9 @@ const InvoiceForm = () => {
                 />
               </Form.Group>
               <Form.Group>
-                <Form.Label>Tax Rate (%)</Form.Label>
+                <Form.Label htmlFor='taxRate'>Tax Rate (%)</Form.Label>
                 <Form.Control
+                id='taxRate'
                   type="number"
                   min="0"
                   max="100"
@@ -345,8 +379,9 @@ const InvoiceForm = () => {
                 />
               </Form.Group>
               <Form.Group>
-                <Form.Label>Tax Amount</Form.Label>
+                <Form.Label htmlFor='taxAmount'>Tax Amount</Form.Label>
                 <Form.Control
+                id='taxAmount'
                   type="number"
                   name="taxAmount"
                   value={values.taxAmount}
@@ -354,8 +389,9 @@ const InvoiceForm = () => {
                 />
               </Form.Group>
               <Form.Group>
-                <Form.Label>Discount</Form.Label>
+                <Form.Label htmlFor='discount'>Discount</Form.Label>
                 <Form.Control
+                id='discount'
                   type="number"
                   min="0"
                   name="discount"
@@ -370,8 +406,9 @@ const InvoiceForm = () => {
                 />
               </Form.Group>
               <Form.Group>
-                <Form.Label>Total</Form.Label>
+                <Form.Label htmlFor='total'>Total</Form.Label>
                 <Form.Control
+                id='total'
                   type="number"
                   name="total"
                   value={values.total}
@@ -382,8 +419,9 @@ const InvoiceForm = () => {
           </Row>
 
           <Form.Group>
-            <Form.Label>Notes</Form.Label>
+            <Form.Label htmlFor='notes'>Notes</Form.Label>
             <Form.Control
+            id='notes'
               as="textarea"
               rows={3}
               name="notes"

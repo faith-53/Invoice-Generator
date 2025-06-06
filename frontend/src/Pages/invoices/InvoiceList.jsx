@@ -12,7 +12,10 @@ const InvoiceList = () => {
   });
 
   useEffect(() => {
-    const fetchInvoices = async () => {
+    fetchInvoices();
+  }, [filters]);
+
+  const fetchInvoices = async () => {
       try {
         const params = {};
         if (filters.status !== 'all') params.status = filters.status;
@@ -23,9 +26,7 @@ const InvoiceList = () => {
       } catch (error) {
         console.error('Error fetching invoices:', error);
       }
-    };
-    fetchInvoices();
-  }, [filters, getInvoices]);
+  };
 
   const handleFilterChange = (e) => {
     setFilters({
@@ -61,8 +62,9 @@ const InvoiceList = () => {
         <Row className="mb-3">
           <Col md={3}>
             <Form.Group>
-              <Form.Label>Status</Form.Label>
+              <Form.Label htmlFor='status'>Status</Form.Label>
               <Form.Control
+              id='status'
                 as="select"
                 name="status"
                 value={filters.status}
@@ -77,8 +79,9 @@ const InvoiceList = () => {
           </Col>
           <Col md={3}>
             <Form.Group>
-              <Form.Label>From Date</Form.Label>
+              <Form.Label htmlFor='fromdate'>From Date</Form.Label>
               <Form.Control
+              id='fromdate'
                 type="date"
                 name="fromDate"
                 value={filters.fromDate}
@@ -88,8 +91,9 @@ const InvoiceList = () => {
           </Col>
           <Col md={3}>
             <Form.Group>
-              <Form.Label>To Date</Form.Label>
+              <Form.Label htmlFor='todate'>To Date</Form.Label>
               <Form.Control
+              id='todate'
                 type="date"
                 name="toDate"
                 value={filters.toDate}
@@ -134,6 +138,7 @@ const InvoiceList = () => {
                     <Link to={`/invoices/${invoice._id}/edit`} className='btn btn-secondary btn-sm'>
                       Edit
                     </Link>
+                    
                   </td>
                 </tr>
               ))

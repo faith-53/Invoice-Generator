@@ -51,8 +51,9 @@ const Register = () => {
           {alert && <Alert variant={alert.type}>{alert.message}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>Name</Form.Label>
+              <Form.Label htmlFor='name'>Name</Form.Label>
               <Form.Control
+              id='name'
                 type="text"
                 name="name"
                 value={credentials.name}
@@ -61,8 +62,9 @@ const Register = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
+              <Form.Label htmlFor='email'>Email</Form.Label>
               <Form.Control
+              id='email'
                 type="email"
                 name="email"
                 value={credentials.email}
@@ -71,8 +73,9 @@ const Register = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Password</Form.Label>
+              <Form.Label htmlFor='password'>Password</Form.Label>
               <Form.Control
+              id='password'
                 type="password"
                 name="password"
                 value={credentials.password}
@@ -81,8 +84,9 @@ const Register = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Company</Form.Label>
+              <Form.Label htmlFor='company'>Company</Form.Label>
               <Form.Control
+              id='company'
                 type="text"
                 name="company"
                 value={credentials.company}
@@ -91,8 +95,9 @@ const Register = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Address</Form.Label>
+              <Form.Label htmlFor='address'>Address</Form.Label>
               <Form.Control
+              id='address'
                 type="text"
                 name="address"
                 value={credentials.address}
@@ -101,8 +106,9 @@ const Register = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Phone</Form.Label>
+              <Form.Label htmlFor='phone'>Phone</Form.Label>
               <Form.Control
+              id='phone'
                 type="text"
                 name="phone"
                 value={credentials.phone}

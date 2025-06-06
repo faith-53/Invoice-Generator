@@ -1,3 +1,7 @@
+html, body, #root {
+  height: 100%;
+}
+
 .App {
   text-align: center;
 }
@@ -35,4 +39,26 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1 0 auto;
+  padding: 20px 0;
+}
+
+.footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Add some bottom margin to cards to prevent footer overlap */
+.card {
+  margin-bottom: 2rem;
 }

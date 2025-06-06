@@ -1,6 +1,7 @@
 import React, { createContext, useState } from 'react';
 import api from '../services/api';
 import { toast } from "react-toastify"
+import { useParams } from 'react-router-dom';
 
 const InvoiceContext = createContext();
 
@@ -11,26 +12,28 @@ export const InvoiceProvider = ({ children }) => {
   
   // Get all invoices
   const getInvoices = async (params = {}) => {
-  try {
-    setLoading(true);
-    const response = await api.get('/api/invoices/list', { params });
-    setInvoices(response.data);
-    setError(null);
-  } catch (err) {
-    setError(err.response?.data?.message || 'Failed to fetch invoices');
-    console.error('Error fetching invoices:', err);
-    toast.error('Failed to fetch invoices');
-  } finally {
-    setLoading(false);
-  }
-};
-
+    try {
+      setLoading(true);
+      const response = await api.get('/api/invoices/list', { params });
+      setInvoices(response.data);
+      setError(null);
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch invoices';
+      setError(errorMessage);
+      console.error('Error fetching invoices:', err);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 // Get single invoice
+
   const getInvoice = async (id) => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/invoices/${id}`); // Fixed the endpoint
-      return response.data;
+      const response = await api.get(`/api/invoices/${id}`);
+      console.log('Raw API response:', response);  // Add this log
+      return response;  // Return the entire response
     } catch (err) {
       console.error('Error fetching invoice:', err);
       throw err;
@@ -77,15 +80,49 @@ export const InvoiceProvider = ({ children }) => {
 
   // Download invoice as PDF
   const downloadInvoice = async (invoiceId) => {
-    
-    const response = await api.get(`/api/invoices/download/${invoiceId}/download`);
-    return response.data;
+    try {
+      const response = await api.get(`/api/invoices/download/${invoiceId}`, {
+        responseType: 'arraybuffer',
+        headers: {
+          'Accept': 'application/pdf',
+          'Content-Type': 'application/pdf'
+        }
+      });
+      return response;
+    } catch (error) {
+      console.error("Error downloading invoice:", error);
+      if (error.response?.data) {
+        try {
+          // Try to parse as JSON first
+          const errorMessage = new TextDecoder().decode(error.response.data);
+          try {
+            error.response.data = JSON.parse(errorMessage);
+          } catch (parseError) {
+            // If JSON parsing fails, use the text message directly
+            error.response.data = { message: errorMessage };
+          }
+        } catch (decodeError) {
+          // If decoding fails, provide a generic error
+          error.response.data = { message: 'Failed to download invoice' };
+        }
+      }
+      throw error;
+    }
   };
 
   // Send invoice via email
   const sendInvoice = async (invoiceId) => {
-    const response = await api.post(`/api/invoices/send/${invoiceId}/send`);
-    return response.data;
+    try {
+      const response = await api.post(`/api/invoices/send/${invoiceId}`, {});
+      return response.data;
+    } catch (error) {
+      console.error("Error sending invoice:", error);
+      if (error.response?.data?.message) {
+        throw error;
+      } else {
+        throw new Error(error.message || 'Failed to send invoice');
+      }
+    }
   };
 
   return (
