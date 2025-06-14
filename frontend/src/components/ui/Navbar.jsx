@@ -1,9 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
-
+import { useTheme } from '../../context/themeContext';
+import { Button } from 'react-bootstrap';
 
 const Navbar = () => {
     const { logoutUser, token } = useAuth();
+    const { isDarkMode, toggleTheme } = useTheme();
     const navigate = useNavigate();
     
 
@@ -12,7 +14,7 @@ const Navbar = () => {
         navigate('/login');
     };
   return (
-    <nav className="navbar navbar-expand-lg bg-dark d-flex justify-between fixed-top">
+    <nav className="navbar navbar-expand-lg d-flex justify-between fixed-top">
         <div className="container-fluid">
             <Link className="navbar-brand text-white fw-bold" to="/">InvoicePro</Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu" >
@@ -32,7 +34,15 @@ const Navbar = () => {
                     
                 </ul>
             </div>
-            <div>
+            <div className="d-flex align-items-center gap-2">
+                <Button
+                    variant="light"
+                    onClick={toggleTheme}
+                    className="theme-toggle-btn"
+                    title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                >
+                    {isDarkMode ? "☀️" : "🌙"}
+                </Button>
                 {token ? (
                     <button 
                         className='btn btn-danger'
@@ -42,7 +52,7 @@ const Navbar = () => {
                     </button>
                 ) : (
                     <>
-                        <Link to="/register" className='btn btn-primary me-2'>Sign Up</Link>
+                        <Link to="/register" className='btn btn-primary'>Sign Up</Link>
                         <Link to="/login" className='btn btn-primary'>Sign In</Link>
                     </>
                 )}
