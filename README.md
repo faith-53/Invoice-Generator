@@ -1,8 +1,6 @@
-# InvoicePro - Professional Invoice Management System
+#Professional Invoice Management System
 
-InvoicePro is a modern, full-stack invoice management system built with React and Node.js. It provides a seamless experience for creating, managing, and tracking invoices with a beautiful, responsive UI and dark mode support.
-
-![InvoicePro Screenshot](screenshot.png)
+Full-stack invoice management system built with React and Node.js. It provides a seamless experience for creating, managing, and tracking invoices with a beautiful, responsive UI and dark mode support.
 
 ## Features
 
@@ -148,10 +146,6 @@ The application will be available at `http://localhost:3000`
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Support
 
 For support, email akinyifaith222@gmail.com or create an issue in the repository.
@@ -161,8 +155,5 @@ For support, email akinyifaith222@gmail.com or create an issue in the repository
 - React Bootstrap for UI components
 - React Router for navigation
 - React Toastify for notifications
-- All contributors who have helped shape this project
 
----
-
-Built with ❤️ by Faith
+Built with  by Faith
